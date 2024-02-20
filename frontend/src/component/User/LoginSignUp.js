@@ -8,10 +8,12 @@ import FaceIcon from "@material-ui/icons/Face";
 import { useDispatch, useSelector } from "react-redux";
 import { clearErrors, login, register } from "../../actions/userAction";
 import { useAlert } from "react-alert";
+import { useNavigate } from "react-router-dom";
 
-const LoginSignUp = ({ history, location }) => {
+const LoginSignUp = ({ location }) => {
   const dispatch = useDispatch();
   const alert = useAlert();
+  const navigate = useNavigate();
 
   const { error, loading, isAuthenticated } = useSelector(
     (state) => state.user
@@ -34,6 +36,8 @@ const LoginSignUp = ({ history, location }) => {
 
   const [avatar, setAvatar] = useState("/Profile.png");
   const [avatarPreview, setAvatarPreview] = useState("/Profile.png");
+
+  const [mounted, setMounted] = useState(true); // New state to track component mount status
 
   const loginSubmit = (e) => {
     e.preventDefault();
@@ -69,7 +73,16 @@ const LoginSignUp = ({ history, location }) => {
     }
   };
 
-  const redirect = location.search ? location.search.split("=")[1] : "/account";
+  const redirect =
+    location && location.search ? location.search.split("=")[1] : "/account";
+
+  useEffect(() => {
+    setMounted(true); // Set mounted to true on component mount
+
+    return () => {
+      setMounted(false); // Set mounted to false on component unmount
+    };
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -77,10 +90,10 @@ const LoginSignUp = ({ history, location }) => {
       dispatch(clearErrors());
     }
 
-    if (isAuthenticated) {
-      history.push(redirect);
+    if (isAuthenticated && mounted) {
+      navigate(redirect);
     }
-  }, [dispatch, error, alert, history, isAuthenticated, redirect]);
+  }, [dispatch, error, alert, navigate, isAuthenticated, redirect, mounted]);
 
   const switchTabs = (e, tab) => {
     if (tab === "login") {

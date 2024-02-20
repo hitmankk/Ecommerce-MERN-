@@ -1,29 +1,29 @@
-import React, { Fragment } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
-import { Redirect, Route } from "react-router-dom";
+import { Route, Navigate } from "react-router-dom"; // Correct import
 
-const ProtectedRoute = ({ isAdmin, component: Component, ...rest }) => {
+const ProtectedRoute = ({ isAdmin, ...rest }) => {
   const { loading, isAuthenticated, user } = useSelector((state) => state.user);
 
+  if (loading) {
+    return null; // or loading spinner, based on your preference
+  }
+
   return (
-    <Fragment>
-      {loading === false && (
-        <Route
-          {...rest}
-          render={(props) => {
-            if (isAuthenticated === false) {
-              return <Redirect to="/login" />;
-            }
-
-            if (isAdmin === true && user.role !== "admin") {
-              return <Redirect to="/login" />;
-            }
-
-            return <Component {...props} />;
-          }}
-        />
-      )}
-    </Fragment>
+    <Route
+      {...rest}
+      element={
+        isAuthenticated ? (
+          isAdmin && user.role !== "admin" ? (
+            <Navigate to="/login" /> // Corrected import
+          ) : (
+            <React.Fragment {...rest} />
+          )
+        ) : (
+          <Navigate to="/login" /> // Corrected import
+        )
+      }
+    />
   );
 };
 

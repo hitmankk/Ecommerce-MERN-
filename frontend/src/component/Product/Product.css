@@ -16,7 +16,7 @@
     min-height: 30vh;
   }
   
-  .paginationBox {
+  .paginationbox {
     display: flex;
     justify-content: center;
     margin: 6vmax;
