@@ -15,10 +15,11 @@ import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import SideBar from "./Sidebar";
 import { DELETE_PRODUCT_RESET } from "../../constants/productConstants";
+import { useNavigate } from "react-router-dom";
 
-const ProductList = ({ history }) => {
+const ProductList = () => {
   const dispatch = useDispatch();
-
+  const history = useNavigate();
   const alert = useAlert();
 
   const { error, products } = useSelector((state) => state.products);
@@ -44,7 +45,7 @@ const ProductList = ({ history }) => {
 
     if (isDeleted) {
       alert.success("Product Deleted Successfully");
-      history.push("/admin/dashboard");
+      history("/admin/products");
       dispatch({ type: DELETE_PRODUCT_RESET });
     }
 
@@ -83,18 +84,14 @@ const ProductList = ({ history }) => {
       minWidth: 150,
       type: "number",
       sortable: false,
-      renderCell: (params) => {
+      renderCell: (cellParams) => {
+        const row = cellParams.row;
         return (
           <Fragment>
-            <Link to={`/admin/product/${params.getValue(params.id, "id")}`}>
+            <Link to={`/admin/product/${row.id}`}>
               <EditIcon />
             </Link>
-
-            <Button
-              onClick={() =>
-                deleteProductHandler(params.getValue(params.id, "id"))
-              }
-            >
+            <Button onClick={() => deleteProductHandler(row.id)}>
               <DeleteIcon />
             </Button>
           </Fragment>
@@ -127,7 +124,7 @@ const ProductList = ({ history }) => {
           <DataGrid
             rows={rows}
             columns={columns}
-            pageSize={10}
+            pageSize={6}
             disableSelectionOnClick
             className="productListTable"
             autoHeight

@@ -15,10 +15,13 @@ import SpellcheckIcon from "@material-ui/icons/Spellcheck";
 import AttachMoneyIcon from "@material-ui/icons/AttachMoney";
 import SideBar from "./Sidebar";
 import { UPDATE_PRODUCT_RESET } from "../../constants/productConstants";
+import { useParams, useNavigate } from "react-router-dom";
 
-const UpdateProduct = ({ history, match }) => {
+const UpdateProduct = () => {
   const dispatch = useDispatch();
   const alert = useAlert();
+  const history = useNavigate();
+  const { id } = useParams();
 
   const { error, product } = useSelector((state) => state.productDetails);
 
@@ -47,12 +50,11 @@ const UpdateProduct = ({ history, match }) => {
     "SmartPhones",
   ];
 
-  const productId = match.params.id;
-
   useEffect(() => {
-    if (product && product._id !== productId) {
-      dispatch(getProductDetails(productId));
+    if (product && product._id !== id) {
+      dispatch(getProductDetails(id));
     } else {
+      // Add a conditional check here to ensure product is defined
       setName(product.name);
       setDescription(product.description);
       setPrice(product.price);
@@ -72,19 +74,10 @@ const UpdateProduct = ({ history, match }) => {
 
     if (isUpdated) {
       alert.success("Product Updated Successfully");
-      history.push("/admin/products");
+      history("/admin/products");
       dispatch({ type: UPDATE_PRODUCT_RESET });
     }
-  }, [
-    dispatch,
-    alert,
-    error,
-    history,
-    isUpdated,
-    productId,
-    product,
-    updateError,
-  ]);
+  }, [dispatch, alert, error, history, id, isUpdated, updateError, product]);
 
   const updateProductSubmitHandler = (e) => {
     e.preventDefault();
@@ -100,7 +93,7 @@ const UpdateProduct = ({ history, match }) => {
     images.forEach((image) => {
       myForm.append("images", image);
     });
-    dispatch(updateProduct(productId, myForm));
+    dispatch(updateProduct(id, myForm));
   };
 
   const updateProductImagesChange = (e) => {
@@ -126,7 +119,7 @@ const UpdateProduct = ({ history, match }) => {
 
   return (
     <Fragment>
-      <MetaData title="Create Product" />
+      <MetaData title="Update Product" />
       <div className="dashboard">
         <SideBar />
         <div className="newProductContainer">
@@ -135,7 +128,7 @@ const UpdateProduct = ({ history, match }) => {
             encType="multipart/form-data"
             onSubmit={updateProductSubmitHandler}
           >
-            <h1>Create Product</h1>
+            <h1>Update Product</h1>
 
             <div>
               <SpellcheckIcon />
@@ -224,7 +217,7 @@ const UpdateProduct = ({ history, match }) => {
               type="submit"
               disabled={loading ? true : false}
             >
-              Create
+              Update
             </Button>
           </form>
         </div>

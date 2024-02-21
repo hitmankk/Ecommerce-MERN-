@@ -1,18 +1,17 @@
 import React, { Fragment, useEffect } from "react";
-import { DataGrid } from "@material-ui/data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import "./myOrders.css";
 import { useSelector, useDispatch } from "react-redux";
 import { clearErrors, myOrders } from "../actions/orderAction";
 import Loader from "../component/layout/Loader/Loader";
 import { Link } from "react-router-dom";
 import { useAlert } from "react-alert";
-import Typography from "@material-ui/core/Typography";
+import Typography from "@mui/material/Typography";
 import MetaData from "../component/layout/MetaData";
-import LaunchIcon from "@material-ui/icons/Launch";
+import LaunchIcon from "@mui/icons-material/Launch";
 
 const MyOrders = () => {
   const dispatch = useDispatch();
-
   const alert = useAlert();
 
   const { loading, error, orders } = useSelector((state) => state.myOrders);
@@ -20,17 +19,13 @@ const MyOrders = () => {
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 300, flex: 1 },
-
     {
       field: "status",
       headerName: "Status",
       minWidth: 150,
       flex: 0.5,
-      cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
-          ? "greenColor"
-          : "redColor";
-      },
+      cellClassName: (cellParams) =>
+        cellParams.row.status === "Delivered" ? "greenColor" : "redColor",
     },
     {
       field: "itemsQty",
@@ -39,7 +34,6 @@ const MyOrders = () => {
       minWidth: 150,
       flex: 0.3,
     },
-
     {
       field: "amount",
       headerName: "Amount",
@@ -47,7 +41,6 @@ const MyOrders = () => {
       minWidth: 270,
       flex: 0.5,
     },
-
     {
       field: "actions",
       flex: 0.3,
@@ -55,15 +48,14 @@ const MyOrders = () => {
       minWidth: 150,
       type: "number",
       sortable: false,
-      renderCell: (params) => {
-        return (
-          <Link to={`/order/${params.getValue(params.id, "id")}`}>
-            <LaunchIcon />
-          </Link>
-        );
-      },
+      renderCell: (renderParams) => (
+        <Link to={`/order/${renderParams.row.id}`}>
+          <LaunchIcon />
+        </Link>
+      ),
     },
   ];
+
   const rows = [];
 
   orders &&

@@ -15,10 +15,11 @@ import {
   clearErrors,
 } from "../../actions/orderAction";
 import { DELETE_ORDER_RESET } from "../../constants/orderConstants";
+import { useNavigate } from "react-router-dom";
 
-const OrderList = ({ history }) => {
+const OrderList = () => {
   const dispatch = useDispatch();
-
+  const history = useNavigate();
   const alert = useAlert();
 
   const { error, orders } = useSelector((state) => state.allOrders);
@@ -42,7 +43,7 @@ const OrderList = ({ history }) => {
 
     if (isDeleted) {
       alert.success("Order Deleted Successfully");
-      history.push("/admin/orders");
+      history("/admin/orders");
       dispatch({ type: DELETE_ORDER_RESET });
     }
 
@@ -57,8 +58,8 @@ const OrderList = ({ history }) => {
       headerName: "Status",
       minWidth: 150,
       flex: 0.5,
-      cellClassName: (params) => {
-        return params.getValue(params.id, "status") === "Delivered"
+      cellClassName: (cellParams) => {
+        return cellParams.getValue(cellParams.id, "status") === "Delivered"
           ? "greenColor"
           : "redColor";
       },
@@ -86,18 +87,15 @@ const OrderList = ({ history }) => {
       minWidth: 150,
       type: "number",
       sortable: false,
-      renderCell: (params) => {
+      renderCell: (rowParams) => {
+        const row = rowParams.row;
         return (
           <Fragment>
-            <Link to={`/admin/order/${params.getValue(params.id, "id")}`}>
+            <Link to={`/admin/order/${row.id}`}>
               <EditIcon />
             </Link>
 
-            <Button
-              onClick={() =>
-                deleteOrderHandler(params.getValue(params.id, "id"))
-              }
-            >
+            <Button onClick={() => deleteOrderHandler(row.id)}>
               <DeleteIcon />
             </Button>
           </Fragment>

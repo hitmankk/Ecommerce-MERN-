@@ -2,9 +2,31 @@ const Products = require("../models/productModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncError");
 const ApiFeatures = require("../utils/apifeatures");
-
+const cloudinary = require("cloudinary");
 // Create Product--Admin
 exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+  let images = [];
+
+  if (typeof req.body.images === "string") {
+    images.push(req.body.images);
+  } else {
+    images = req.body.images;
+  }
+
+  const imagesLinks = [];
+
+  for (let i = 0; i < images.length; i++) {
+    const result = await cloudinary.v2.uploader.upload(images[i], {
+      folder: "products",
+    });
+
+    imagesLinks.push({
+      public_id: result.public_id,
+      url: result.secure_url,
+    });
+  }
+
+  req.body.images = imagesLinks;
   req.body.user = req.user.id;
 
   const product = await Products.create(req.body);
@@ -14,7 +36,6 @@ exports.createProduct = catchAsyncErrors(async (req, res, next) => {
     product,
   });
 });
-
 // gET aLL pRODUCT
 exports.getAllProducts = catchAsyncErrors(async (req, res) => {
   const resultPerPage = 8;
@@ -34,6 +55,16 @@ exports.getAllProducts = catchAsyncErrors(async (req, res) => {
   });
 });
 
+// Get All Product (Admin)
+exports.getAdminProducts = catchAsyncErrors(async (req, res, next) => {
+  const products = await Products.find();
+
+  res.status(200).json({
+    success: true,
+    products,
+  });
+});
+
 //  get product details
 exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
   const product = await Products.findById(req.params.id);
@@ -46,18 +77,52 @@ exports.getProductDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// update product --Admin
+// Update Product -- Admin
 
 exports.updateProduct = catchAsyncErrors(async (req, res, next) => {
-  let product = Products.findById(req.param.id);
+  let product = await Products.findById(req.params.id);
+
   if (!product) {
-    return next(new ErrorHandler("Product Not Found", 404));
+    return next(new ErrorHander("Product not found", 404));
   }
+
+  // Images Start Here
+  let images = [];
+
+  if (typeof req.body.images === "string") {
+    images.push(req.body.images);
+  } else {
+    images = req.body.images;
+  }
+
+  if (images !== undefined) {
+    // Deleting Images From Cloudinary
+    for (let i = 0; i < product.images.length; i++) {
+      await cloudinary.v2.uploader.destroy(product.images[i].public_id);
+    }
+
+    const imagesLinks = [];
+
+    for (let i = 0; i < images.length; i++) {
+      const result = await cloudinary.v2.uploader.upload(images[i], {
+        folder: "products",
+      });
+
+      imagesLinks.push({
+        public_id: result.public_id,
+        url: result.secure_url,
+      });
+    }
+
+    req.body.images = imagesLinks;
+  }
+
   product = await Products.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidator: true,
+    runValidators: true,
     useFindAndModify: false,
   });
+
   res.status(200).json({
     success: true,
     product,

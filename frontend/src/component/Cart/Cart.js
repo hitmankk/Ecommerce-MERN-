@@ -12,6 +12,7 @@ const Cart = () => {
   const dispatch = useDispatch();
   const navigation = useNavigate();
   const { cartItems } = useSelector((state) => state.cart);
+  const { isAuthenticated } = useSelector((state) => state.user);
 
   const increaseQuantity = (id, quantity, stock) => {
     const newQty = quantity + 1;
@@ -34,7 +35,11 @@ const Cart = () => {
   };
 
   const checkoutHandler = () => {
-    navigation("/login?redirect=shipping");
+    if (isAuthenticated) {
+      navigation("/shipping");
+    } else {
+      navigation("/login?redirect=shipping");
+    }
   };
 
   return (

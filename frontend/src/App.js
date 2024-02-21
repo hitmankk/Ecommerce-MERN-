@@ -4,8 +4,8 @@ import Footer from "./component/layout/Footer/Footer.js";
 import Home from "./component/Home/Home.js";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import WebFont from "webfontloader";
-import React from "react";
-import Product from "./component/Product/Product.js";
+import React, { useState } from "react";
+import Product from "./component/Product/Product";
 import ProductDetails from "./component/Product/ProductDetails.js";
 import Search from "./component/Product/Search";
 import Contact from "./component/layout/Contact/Contact";
@@ -36,8 +36,18 @@ import ProcessOrder from "./component/Admin/ProcessOrder";
 import UsersList from "./component/Admin/UsersList";
 import UpdateUser from "./component/Admin/UpdateUser";
 import ProductReviews from "./component/Admin/ProductReviews";
+import axios from "axios";
+import Payment from "./component/Cart/Payment";
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+
 function App() {
   const { isAuthenticated, user } = useSelector((state) => state.user);
+  const [stripeApiKey, setStripeApiKey] = React.useState("");
+  async function getStripeApiKey() {
+    const { data } = await axios.get("/api/v1/stripeapikey");
+    setStripeApiKey(data.stripeApiKey);
+  }
   React.useEffect(() => {
     WebFont.load({
       google: {
@@ -45,12 +55,23 @@ function App() {
       },
     });
     store.dispatch(loadUser());
+    getStripeApiKey();
   }, []);
+  window.addEventListener("contextmenu", (e) => e.preventDefault());
 
   return (
     <Router>
       <Header />
       {isAuthenticated && <UserOptions user={user} />}
+
+      {stripeApiKey && (
+        <Elements stripe={loadStripe(stripeApiKey)}>
+          <Routes>
+            <Route exact path="/process/payment" element={<Payment />} />
+          </Routes>
+        </Elements>
+      )}
+
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductDetails />} />
@@ -71,6 +92,7 @@ function App() {
         <Route path="/orders" element={<MyOrders />} />
         <Route path="/order/confirm" element={<ConfirmOrder />} />
         <Route path="/order/:id" element={<OrderDetails />} />
+
         <Route isAdmin={true} path="/admin/dashboard" element={<Dashboard />} />
         <Route
           isAdmin={true}
@@ -83,6 +105,7 @@ function App() {
           path="/admin/product/:id"
           element={<UpdateProduct />}
         />
+
         <Route isAdmin={true} path="/admin/orders" element={<OrderList />} />
         <Route
           isAdmin={true}

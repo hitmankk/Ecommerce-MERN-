@@ -72,9 +72,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
   const resetToken = user.getResetPasswordToken();
   await user.save({ validateBeforeSave: false });
 
-  const resetPasswordUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/password/reset/${resetToken}`;
+  const resetPasswordUrl = `${process.env.FRONTEND_URL}/api/v1/password/reset/${resetToken}`;
 
   const message = `your password reset token is :- \n\n${resetPasswordUrl} \n\n If you have not requested
    this email then please ignore it`;
@@ -216,8 +214,7 @@ exports.getSingleUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Update User Role --admin
-
+// update User Role -- Admin
 exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
   const newUserData = {
     name: req.body.name,
@@ -225,7 +222,7 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     role: req.body.role,
   };
 
-  const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+  await User.findByIdAndUpdate(req.params.id, newUserData, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
@@ -235,7 +232,6 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
-
 // Delete User --admin
 
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {

@@ -4,16 +4,11 @@ import "./dashboard.css";
 import { Typography } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { Doughnut, Line } from "react-chartjs-2";
-
 import { useSelector, useDispatch } from "react-redux";
 import { getAdminProduct } from "../../actions/productAction";
 import { getAllOrders } from "../../actions/orderAction.js";
 import { getAllUsers } from "../../actions/userAction.js";
 import MetaData from "../layout/MetaData";
-
-// Explicitly import the required chart.js scales
-import "chartjs-adapter-date-fns"; // You can use other adapters as needed
-import "chartjs-adapter-moment";
 
 const Dashboard = () => {
   const dispatch = useDispatch();

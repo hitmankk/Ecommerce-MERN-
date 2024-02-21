@@ -11,9 +11,11 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import SideBar from "./Sidebar";
 import { getAllUsers, clearErrors, deleteUser } from "../../actions/userAction";
 import { DELETE_USER_RESET } from "../../constants/userConstants";
+import { useNavigate } from "react-router-dom";
 
-const UsersList = ({ history }) => {
+const UsersList = () => {
   const dispatch = useDispatch();
+  const history = useNavigate();
 
   const alert = useAlert();
 
@@ -42,7 +44,7 @@ const UsersList = ({ history }) => {
 
     if (isDeleted) {
       alert.success(message);
-      history.push("/admin/users");
+      history("/admin/users");
       dispatch({ type: DELETE_USER_RESET });
     }
 
@@ -71,8 +73,8 @@ const UsersList = ({ history }) => {
       type: "number",
       minWidth: 150,
       flex: 0.3,
-      cellClassName: (params) => {
-        return params.getValue(params.id, "role") === "admin"
+      cellClassName: (cellParams) => {
+        return cellParams.getValue(cellParams.id, "role") === "admin"
           ? "greenColor"
           : "redColor";
       },
@@ -85,18 +87,15 @@ const UsersList = ({ history }) => {
       minWidth: 150,
       type: "number",
       sortable: false,
-      renderCell: (params) => {
+      renderCell: (cellParams) => {
+        const row = cellParams.row;
         return (
           <Fragment>
-            <Link to={`/admin/user/${params.getValue(params.id, "id")}`}>
+            <Link to={`/admin/user/${row.id}`}>
               <EditIcon />
             </Link>
 
-            <Button
-              onClick={() =>
-                deleteUserHandler(params.getValue(params.id, "id"))
-              }
-            >
+            <Button onClick={() => deleteUserHandler(row.id)}>
               <DeleteIcon />
             </Button>
           </Fragment>
