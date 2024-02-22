@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import "./Header.css";
 import { FaSearch } from "react-icons/fa";
@@ -6,7 +6,7 @@ import { MdPerson } from "react-icons/md";
 import { FaCartShopping } from "react-icons/fa6";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { GiCrossMark } from "react-icons/gi";
-
+import Logo from "../../../images/E-MART.png";
 function Header() {
   const [click, setClick] = useState(false);
 
@@ -24,6 +24,9 @@ function Header() {
       />
       <nav className="navbar">
         <div className="nav-container">
+          <NavLink exact to="/" className="nav-logo">
+            <img className="logo" src={Logo} alt="Logo" />
+          </NavLink>
           <ul className={click ? "nav-menu active" : "nav-menu"}>
             <li className="nav-item">
               <NavLink

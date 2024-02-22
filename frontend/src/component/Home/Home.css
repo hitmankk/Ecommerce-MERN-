@@ -1,5 +1,5 @@
 .banner {
-    background-image: url("../../images/cover.jfif");
+    background-image: url("../../images/cover.png");
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -79,6 +79,7 @@
     margin: 2vmax;
     transition: all 0.5s;
     padding-bottom: 0.5vmax;
+    box-shadow: 1px 1px 5px 0.5px rgb(218, 218, 218);
   }
   
   .productCard > img {
