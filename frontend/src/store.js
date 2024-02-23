@@ -1,5 +1,6 @@
-import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
+import { createStore, combineReducers, applyMiddleware } from "redux";
 import { thunk } from "redux-thunk";
+
 import {
   newProductReducer,
   newReviewReducer,
@@ -9,6 +10,7 @@ import {
   productsReducer,
   reviewReducer,
 } from "./reducers/productReducer";
+
 import {
   allUsersReducer,
   forgotPasswordReducer,
@@ -16,6 +18,7 @@ import {
   userDetailsReducer,
   userReducer,
 } from "./reducers/userReducer";
+
 import { cartReducer } from "./reducers/cartReducer";
 import {
   allOrdersReducer,
@@ -25,7 +28,7 @@ import {
   orderReducer,
 } from "./reducers/orderReducer";
 
-const reducer = {
+const rootReducer = combineReducers({
   products: productsReducer,
   productDetails: productDetailsReducer,
   user: userReducer,
@@ -44,9 +47,9 @@ const reducer = {
   userDetails: userDetailsReducer,
   productReviews: productReviewsReducer,
   review: reviewReducer,
-};
+});
 
-let initialState = {
+const initialState = {
   cart: {
     cartItems: localStorage.getItem("cartItems")
       ? JSON.parse(localStorage.getItem("cartItems"))
@@ -57,11 +60,12 @@ let initialState = {
   },
 };
 
-const store = configureStore({
-  reducer,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
-  preloadedState: initialState,
-  devTools: process.env.NODE_ENV !== "production",
-});
+const middleware = [thunk];
+
+const store = createStore(
+  rootReducer,
+  initialState,
+  applyMiddleware(...middleware)
+);
 
 export default store;
