@@ -1,6 +1,5 @@
-import { createStore, combineReducers, applyMiddleware, compose } from "redux";
+import { configureStore, getDefaultMiddleware } from "@reduxjs/toolkit";
 import { thunk } from "redux-thunk";
-// import { composeWithDevTools } from "redux-devtools-extension";
 import {
   newProductReducer,
   newReviewReducer,
@@ -10,7 +9,6 @@ import {
   productsReducer,
   reviewReducer,
 } from "./reducers/productReducer";
-
 import {
   allUsersReducer,
   forgotPasswordReducer,
@@ -18,7 +16,6 @@ import {
   userDetailsReducer,
   userReducer,
 } from "./reducers/userReducer";
-
 import { cartReducer } from "./reducers/cartReducer";
 import {
   allOrdersReducer,
@@ -28,7 +25,7 @@ import {
   orderReducer,
 } from "./reducers/orderReducer";
 
-const reducer = combineReducers({
+const reducer = {
   products: productsReducer,
   productDetails: productDetailsReducer,
   user: userReducer,
@@ -47,7 +44,7 @@ const reducer = combineReducers({
   userDetails: userDetailsReducer,
   productReviews: productReviewsReducer,
   review: reviewReducer,
-});
+};
 
 let initialState = {
   cart: {
@@ -60,12 +57,11 @@ let initialState = {
   },
 };
 
-const middleware = [thunk];
-const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(
+const store = configureStore({
   reducer,
-  initialState,
-  composeEnhancers(applyMiddleware(...middleware))
-);
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
+  preloadedState: initialState,
+  devTools: process.env.NODE_ENV !== "production",
+});
 
 export default store;
